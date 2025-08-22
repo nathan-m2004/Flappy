@@ -26,6 +26,7 @@ module.exports.Player = class Player {
         }
     }
     collision(block) {
+        if (!block) return;
         if (
             block.x < this.x + this.radius &&
             block.y > this.y - this.radius &&
