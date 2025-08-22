@@ -29,13 +29,13 @@ module.exports.Player = class Player {
         if (
             block.x < this.x + this.radius &&
             block.y > this.y - this.radius &&
-            block.x + block.width > this.x + this.radius
+            block.x + block.width > this.x - this.radius
         ) {
             return true;
         } else if (
             block.x < this.x + this.radius &&
             block.y + block.height < this.y + this.radius &&
-            block.x + block.width > this.x + this.radius
+            block.x + block.width > this.x - this.radius
         ) {
             return true;
         } else {
