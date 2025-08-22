@@ -12,6 +12,8 @@ class Game {
         this.timeStamp = 0;
         this.deltaTime;
         this.player = new Player(this.canvas.width / 4, this.canvas.height / 3);
+
+        // Block
         this.blocks = [];
         this.blockDelayMiliseconds = 2000;
         this.blockMinDelayMiliseconds = 1000;
@@ -54,12 +56,14 @@ class Game {
 
         // Player
         this.player.physics(this.gravity, this.deltaTime);
-        const collisionBlock0 = this.player.collision(this.blocks[0]);
-        const collisionBlock1 = this.player.collision(this.blocks[1]);
-        if (collisionBlock0 || collisionBlock1) {
-            window.cancelAnimationFrame(this.animationFrame);
-            this.isGameOver = true;
-        }
+        this.blocks.forEach((block) => {
+            const collision = this.player.collision(block);
+            if (collision) {
+                window.cancelAnimationFrame(this.animationFrame);
+                this.isGameOver = true;
+            }
+        });
+
         this.player.draw(this.canvas, this.context);
 
         // Block
