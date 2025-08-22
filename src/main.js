@@ -3,7 +3,7 @@ const { Block } = require("./classes/Blocks.js");
 const canvas = document.getElementById("flappyCanvas");
 
 class Game {
-    constructor() {
+    constructor(canvas) {
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
         this.gravity = 9.8;
@@ -12,12 +12,29 @@ class Game {
         this.timeStamp = 0;
         this.deltaTime;
         this.player = new Player(this.canvas.width / 4, this.canvas.height / 3);
-        this.block = new Block(
-            this.canvas.width,
-            this.canvas.height / 2,
-            200,
-            400
-        );
+        this.blocks = [];
+        this.blockDelayMiliseconds = 2000;
+        this.lastBlock = 0;
+    }
+    getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min) + min);
+    }
+    blockDeletion() {
+        if (!this.blocks[0]) return;
+        if (this.blocks[0].x < 0 - this.blocks[0].width) {
+            this.blocks.shift();
+        }
+    }
+    blockCreation() {
+        const x = this.canvas.width;
+        const yMin = this.canvas.height / 10;
+        const yMax = this.canvas.height / 2;
+        if (this.timeStamp - this.lastBlock >= this.blockDelayMiliseconds) {
+            this.blocks.push(
+                new Block(x, this.getRandomInt(yMin, yMax), 200, 400)
+            );
+            this.lastBlock = this.timeStamp;
+        } else return;
     }
     drawLoop(currentTime) {
         if (this.isGameOver) return;
@@ -29,7 +46,7 @@ class Game {
 
         // Player
         this.player.physics(this.gravity, this.deltaTime);
-        const collision = this.player.collision(this.block);
+        const collision = this.player.collision(this.blocks[0]);
         if (collision) {
             window.cancelAnimationFrame(this.animationFrame);
             this.isGameOver = true;
@@ -37,8 +54,12 @@ class Game {
         this.player.draw(this.canvas, this.context);
 
         // Block
-        this.block.move(this.deltaTime, this.timeStamp);
-        this.block.draw(this.canvas, this.context);
+        this.blockCreation();
+        this.blocks.forEach((block) => {
+            block.move(this.deltaTime, this.timeStamp);
+            block.draw(this.canvas, this.context);
+        });
+        this.blockDeletion();
 
         this.context.stroke();
 
@@ -57,7 +78,7 @@ window.onload = () => {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    game = new Game();
+    game = new Game(canvas);
     game.animationFrame = window.requestAnimationFrame((currentTime) => {
         game.drawLoop(currentTime);
     });
