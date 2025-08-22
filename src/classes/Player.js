@@ -27,21 +27,20 @@ module.exports.Player = class Player {
     }
     collision(block) {
         if (
-            block.x < this.x &&
-            block.y > this.y &&
-            block.x + block.width > this.x
+            block.x < this.x + this.radius &&
+            block.y > this.y - this.radius &&
+            block.x + block.width > this.x + this.radius
         ) {
-            console.log("collision");
-        }
-        if (
-            block.x < this.x &&
-            block.y + block.height < this.y &&
-            block.x + block.width > this.x
+            return true;
+        } else if (
+            block.x < this.x + this.radius &&
+            block.y + block.height < this.y + this.radius &&
+            block.x + block.width > this.x + this.radius
         ) {
-            console.log("collision");
+            return true;
+        } else {
+            return false;
         }
-        //blockX, blockY, blockWidth, -canvas.height - blockY;
-        //this.x, this.y + this.height, this.width, canvas.height
     }
     physics(gravity, deltaTime) {
         this.velocityy += gravity * deltaTime;
