@@ -14,6 +14,8 @@ class Game {
         this.player = new Player(this.canvas.width / 4, this.canvas.height / 3);
         this.blocks = [];
         this.blockDelayMiliseconds = 2000;
+        this.blockMinDelayMiliseconds = 1000;
+        this.blockDelayRate = 0.8;
         this.lastBlock = 0;
     }
     getRandomInt(min, max) {
@@ -29,9 +31,15 @@ class Game {
         const x = this.canvas.width;
         const yMin = this.canvas.height / 10;
         const yMax = this.canvas.height / 2;
+        const width = 200;
+        const height = 400;
+        if (this.blockDelayMiliseconds > this.blockMinDelayMiliseconds) {
+            this.blockDelayMiliseconds -=
+                this.blockDelayRate * (this.deltaTime * 3);
+        }
         if (this.timeStamp - this.lastBlock >= this.blockDelayMiliseconds) {
             this.blocks.push(
-                new Block(x, this.getRandomInt(yMin, yMax), 200, 400)
+                new Block(x, this.getRandomInt(yMin, yMax), width, height)
             );
             this.lastBlock = this.timeStamp;
         } else return;
@@ -46,8 +54,9 @@ class Game {
 
         // Player
         this.player.physics(this.gravity, this.deltaTime);
-        const collision = this.player.collision(this.blocks[0]);
-        if (collision) {
+        const collisionBlock0 = this.player.collision(this.blocks[0]);
+        const collisionBlock1 = this.player.collision(this.blocks[1]);
+        if (collisionBlock0 || collisionBlock1) {
             window.cancelAnimationFrame(this.animationFrame);
             this.isGameOver = true;
         }
@@ -83,7 +92,9 @@ window.onload = () => {
         game.drawLoop(currentTime);
     });
 
-    window.addEventListener("keydown", () => {
-        game.player.jump(game.timeStamp);
+    window.addEventListener("keypress", (event) => {
+        if (event.code === "Space") {
+            game.player.jump(game.timeStamp);
+        }
     });
 };
