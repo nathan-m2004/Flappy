@@ -11,7 +11,9 @@ class Game {
         this.isGameOver = false;
         this.timeStamp = 0;
         this.deltaTime;
-        this.player = new Player(this.canvas.width / 4, this.canvas.height / 3);
+        this.players = [
+            new Player(this.canvas.width / 4, this.canvas.height / 3),
+        ];
 
         // Block
         this.blocks = [];
@@ -55,16 +57,18 @@ class Game {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Player
-        this.player.physics(this.gravity, this.deltaTime);
-        this.blocks.forEach((block) => {
-            const collision = this.player.collision(block);
-            if (collision) {
-                window.cancelAnimationFrame(this.animationFrame);
-                this.isGameOver = true;
-            }
-        });
+        this.players.forEach((player) => {
+            player.physics(this.gravity, this.deltaTime);
+            this.blocks.forEach((block) => {
+                const collision = player.collision(block);
+                if (collision) {
+                    window.cancelAnimationFrame(this.animationFrame);
+                    this.isGameOver = true;
+                }
+            });
 
-        this.player.draw(this.canvas, this.context);
+            player.draw(this.canvas, this.context);
+        });
 
         // Block
         this.blockCreation();
@@ -98,7 +102,7 @@ window.onload = () => {
 
     window.addEventListener("keypress", (event) => {
         if (event.code === "Space") {
-            game.player.jump(game.timeStamp);
+            game.players[0].jump(game.timeStamp);
         }
     });
 };
