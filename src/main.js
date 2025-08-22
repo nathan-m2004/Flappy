@@ -1,33 +1,41 @@
 const { Player } = require("./classes/Player.js");
 const { Block } = require("./classes/Blocks.js");
 const canvas = document.getElementById("flappyCanvas");
-const context = canvas.getContext("2d");
 
-const gravity = 9.8;
+class Game {
+    constructor() {
+        this.canvas = canvas;
+        this.context = canvas.getContext("2d");
+        this.gravity = 9.8;
+        this.animationFrame;
+        this.timeStamp = 0;
+        this.deltaTime;
+        this.player = new Player(this.canvas.width / 4, this.canvas.height / 3);
+        this.block = new Block(
+            this.canvas.width,
+            this.canvas.height / 2,
+            200,
+            400
+        );
+    }
+    drawLoop(currentTime) {
+        this.deltaTime = (currentTime - this.timeStamp) / 100;
+        this.timeStamp = currentTime;
 
-let animationFrame;
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.player.physics(this.gravity, this.deltaTime);
+        this.player.collision(this.block);
+        this.player.draw(this.canvas, this.context);
 
-let timeStamp = 0;
-let deltaTime;
-let player;
-let block;
+        this.block.move(this.deltaTime, this.timeStamp);
+        this.block.draw(this.canvas, this.context);
 
-function drawLoop(currentTime) {
-    deltaTime = (currentTime - timeStamp) / 100;
-    timeStamp = currentTime;
+        this.context.stroke();
 
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    player.physics(gravity, deltaTime);
-    player.collision(block);
-    player.draw(canvas, context);
-
-    block.move(deltaTime, timeStamp);
-    block.draw(canvas, context);
-
-    context.stroke();
-
-    animationFrame = window.requestAnimationFrame(drawLoop);
+        this.animationFrame = window.requestAnimationFrame((currentTime) => {
+            game.drawLoop(currentTime);
+        });
+    }
 }
 
 window.onload = () => {
@@ -39,13 +47,12 @@ window.onload = () => {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    player = new Player(canvas.width / 4, canvas.height / 3);
-
-    block = new Block(canvas.width, canvas.height / 2, 200, 400);
-
-    window.addEventListener("keydown", () => {
-        player.jump(timeStamp);
+    game = new Game();
+    game.animationFrame = window.requestAnimationFrame((currentTime) => {
+        game.drawLoop(currentTime);
     });
 
-    animationFrame = window.requestAnimationFrame(drawLoop);
+    window.addEventListener("keydown", () => {
+        game.player.jump(game.timeStamp);
+    });
 };
