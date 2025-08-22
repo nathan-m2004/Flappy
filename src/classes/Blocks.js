@@ -20,13 +20,8 @@ module.exports.Block = class Block {
     }
     draw(canvas, context) {
         context.beginPath();
-        context.rect(this.x, this.y, this.width, -canvas.height - this.x);
-        context.rect(
-            this.x,
-            this.y + this.height,
-            this.width,
-            canvas.height - this.x
-        );
+        context.rect(this.x, this.y, this.width, -canvas.height - this.y);
+        context.rect(this.x, this.y + this.height, this.width, canvas.height);
         context.closePath();
         context.fillStyle = this.color;
         context.fill();
