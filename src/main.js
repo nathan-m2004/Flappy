@@ -19,6 +19,7 @@ function drawLoop(currentTime) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     player.physics(gravity, deltaTime);
+    player.collision(block);
     player.draw(canvas, context);
 
     block.move(deltaTime, timeStamp);

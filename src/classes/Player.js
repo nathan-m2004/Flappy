@@ -25,6 +25,24 @@ module.exports.Player = class Player {
             this.velocityy = this.velocityLimit;
         }
     }
+    collision(block) {
+        if (
+            block.x < this.x &&
+            block.y > this.y &&
+            block.x + block.width > this.x
+        ) {
+            console.log("collision");
+        }
+        if (
+            block.x < this.x &&
+            block.y + block.height < this.y &&
+            block.x + block.width > this.x
+        ) {
+            console.log("collision");
+        }
+        //blockX, blockY, blockWidth, -canvas.height - blockY;
+        //this.x, this.y + this.height, this.width, canvas.height
+    }
     physics(gravity, deltaTime) {
         this.velocityy += gravity * deltaTime;
         this.y += this.velocityy * deltaTime;
