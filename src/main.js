@@ -1,5 +1,6 @@
 const { Player } = require("./classes/Player.js");
 const { Block } = require("./classes/Blocks.js");
+const { PlayerGenetic } = require("./classes/Genetic.js");
 const canvas = document.getElementById("flappyCanvas");
 
 class Game {
@@ -58,10 +59,14 @@ class Game {
 
         // Player
         this.players.forEach((player) => {
+            genetic.think(this.blocks[0], player, this.canvas, () => {
+                player.jump(this.timeStamp);
+            });
             player.physics(this.gravity, this.deltaTime);
             this.blocks.forEach((block) => {
                 const collision = player.collision(block);
                 if (collision) {
+                    genetic.isDead = true;
                     window.cancelAnimationFrame(this.animationFrame);
                     this.isGameOver = true;
                 }
@@ -96,13 +101,16 @@ window.onload = () => {
     window.addEventListener("resize", resizeCanvas);
 
     game = new Game(canvas);
+    genetic = new PlayerGenetic();
     game.animationFrame = window.requestAnimationFrame((currentTime) => {
         game.drawLoop(currentTime);
     });
 
+    /*
     window.addEventListener("keypress", (event) => {
         if (event.code === "Space") {
             game.players[0].jump(game.timeStamp);
         }
     });
+    **/
 };
