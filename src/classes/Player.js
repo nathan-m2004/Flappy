@@ -1,5 +1,5 @@
 module.exports.Player = class Player {
-    constructor(x, y) {
+    constructor(x, y, transparency) {
         this.x = x;
         this.y = y;
         this.velocityy = 0;
@@ -8,6 +8,7 @@ module.exports.Player = class Player {
         this.jumpTimer = 0;
         this.radius = 25;
         this.color = "black";
+        this.transparency = transparency;
     }
     boundaries(canvas) {
         const canvasTop = 0;
@@ -61,7 +62,9 @@ module.exports.Player = class Player {
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
         context.closePath();
         context.fillStyle = this.color;
+        context.globalAlpha = this.transparency;
         context.fill();
+        context.globalAlpha = 1;
 
         this.boundaries(canvas);
     }

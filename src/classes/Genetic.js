@@ -1,4 +1,5 @@
 const { Matrix } = require("./Matrix.js");
+const { Player } = require("./Player.js");
 
 class NeuralNetwork {
     constructor(inputNodes, hiddenNodes, outputNodes) {
@@ -32,15 +33,18 @@ class NeuralNetwork {
 }
 
 module.exports.PlayerGenetic = class PlayerGenetic {
-    constructor() {
+    constructor(canvas) {
         this.brain = new NeuralNetwork(5, 3, 1);
+        this.player = new Player(canvas.width / 4, canvas.height / 3, 0.45);
         this.score = 0;
         this.isDead = false;
     }
     addScore() {
+        if (this.isDead) return;
         this.score += 1;
+        console.log(this.score);
     }
-    think(block, player, canvas, callbackFn) {
+    think(block, canvas, timeStamp) {
         if (block && !this.isDead) {
             function map(value, min_in, max_in, min_out, max_out) {
                 return (
@@ -52,23 +56,37 @@ module.exports.PlayerGenetic = class PlayerGenetic {
 
             let inputs = [];
             inputs[0] = map(
-                player.velocityy,
-                player.velocityLimit,
-                -player.velocityLimit,
+                this.player.velocityy,
+                this.player.velocityLimit,
+                -this.player.velocityLimit,
                 -1,
                 1
             );
-            inputs[1] = map(player.y, 0, canvas.height, -1, 1);
+            inputs[1] = map(this.player.y, 0, canvas.height, -1, 1);
             inputs[2] = map(block.x, 0, canvas.width, -1, 1);
             inputs[3] = map(block.y, 0, canvas.height, -1, 1);
-            inputs[4] = map(block.x - player.x, 0, canvas.width, -1, 1);
+            inputs[4] = map(block.x - this.player.x, 0, canvas.width, -1, 1);
 
             let output = this.brain.feedForward(inputs);
 
-            console.log(this.isDead);
             if (output[0] > 0.5) {
-                if (callbackFn) callbackFn();
+                this.jump(timeStamp);
             }
         }
+    }
+    jump(timeStamp) {
+        this.player.jump(timeStamp);
+    }
+    physics(gravity, deltaTime) {
+        if (this.isDead) return;
+        this.player.physics(gravity, deltaTime);
+    }
+    draw(canvas, context) {
+        if (this.isDead) return;
+        this.player.draw(canvas, context);
+    }
+    collision(block) {
+        if (this.isDead) return;
+        return this.player.collision(block);
     }
 };
