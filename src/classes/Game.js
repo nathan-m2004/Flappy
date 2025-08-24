@@ -1,5 +1,5 @@
-const { Player } = require("./Player.js");
 const { Block } = require("./Blocks.js");
+const { PlayerGenetic } = require("./Genetic.js");
 
 module.exports.Game = class Game {
     constructor(canvas) {
@@ -9,10 +9,13 @@ module.exports.Game = class Game {
         this.animationFrame;
         this.isGameOver = false;
         this.timeStamp = 0;
-        this.deltaTime;
-        this.players = [
-            new Player(this.canvas.width / 4, this.canvas.height / 3),
-        ];
+        this.deltaTime = 0;
+
+        this.players = [];
+        this.populationSize = 100;
+        for (let i = 0; i < this.populationSize; i++) {
+            this.players.push(new PlayerGenetic(this.canvas));
+        }
 
         // Block
         this.blocks = [];
@@ -28,6 +31,9 @@ module.exports.Game = class Game {
         if (!this.blocks[0]) return;
         if (this.blocks[0].x < 0 - this.blocks[0].width) {
             this.blocks.shift();
+            this.players.forEach((player) => {
+                player.addScore();
+            });
         }
     }
     blockCreation() {
@@ -48,7 +54,14 @@ module.exports.Game = class Game {
         } else return;
     }
     drawLoop(currentTime) {
-        if (this.isGameOver) return;
+        if (this.isGameOver) {
+            window.restartGame();
+            return;
+        }
+
+        if (this.timeStamp === 0) {
+            this.timeStamp = currentTime;
+        }
 
         this.deltaTime = (currentTime - this.timeStamp) / 100;
         this.timeStamp = currentTime;
@@ -57,21 +70,23 @@ module.exports.Game = class Game {
 
         // Player
         this.players.forEach((player) => {
-            genetic.think(this.blocks[0], player, this.canvas, () => {
-                player.jump(this.timeStamp);
-            });
+            player.think(this.blocks[0], this.canvas, this.timeStamp);
             player.physics(this.gravity, this.deltaTime);
             this.blocks.forEach((block) => {
                 const collision = player.collision(block);
                 if (collision) {
-                    genetic.isDead = true;
-                    window.cancelAnimationFrame(this.animationFrame);
-                    this.isGameOver = true;
+                    player.isDead = true;
+                    //this.isGameOver = true;
+                    //window.restartGame();
                 }
             });
 
             player.draw(this.canvas, this.context);
         });
+        const allDead = this.players.every((player) => player.isDead);
+        if (allDead) {
+            this.isGameOver = true;
+        }
 
         // Block
         this.blockCreation();

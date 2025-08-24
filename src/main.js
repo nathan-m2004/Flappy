@@ -1,6 +1,15 @@
 const { Game } = require("./classes/Game.js");
-const { PlayerGenetic } = require("./classes/Genetic.js");
 const canvas = document.getElementById("flappyCanvas");
+
+function restartGame() {
+    window.cancelAnimationFrame(game.animationFrame);
+
+    game = new Game(canvas);
+    game.isGameOver = false;
+    game.animationFrame = window.requestAnimationFrame((currentTime) => {
+        game.drawLoop(currentTime);
+    });
+}
 
 window.onload = () => {
     function resizeCanvas() {
@@ -12,7 +21,6 @@ window.onload = () => {
     window.addEventListener("resize", resizeCanvas);
 
     game = new Game(canvas);
-    genetic = new PlayerGenetic();
     game.animationFrame = window.requestAnimationFrame((currentTime) => {
         game.drawLoop(currentTime);
     });
