@@ -4,7 +4,8 @@ const canvas = document.getElementById("flappyCanvas");
 function restartGame() {
     window.cancelAnimationFrame(game.animationFrame);
 
-    game = new Game(canvas);
+    const newGeneration = game.createNewGeneration();
+    game = new Game(canvas, newGeneration);
     game.isGameOver = false;
     game.animationFrame = window.requestAnimationFrame((currentTime) => {
         game.drawLoop(currentTime);
