@@ -2,7 +2,7 @@ const { Block } = require("./Blocks.js");
 const { PlayerGenetic } = require("./Genetic.js");
 
 module.exports.Game = class Game {
-    constructor(canvas) {
+    constructor(canvas, players) {
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
         this.gravity = 9.8;
@@ -11,10 +11,15 @@ module.exports.Game = class Game {
         this.timeStamp = 0;
         this.deltaTime = 0;
 
-        this.players = [];
+        this.parrentsCrossoverAmount = 90;
         this.populationSize = 100;
-        for (let i = 0; i < this.populationSize; i++) {
-            this.players.push(new PlayerGenetic(this.canvas));
+        if (players) {
+            this.players = players;
+        } else {
+            this.players = [];
+            for (let i = 0; i < this.populationSize; i++) {
+                this.players.push(new PlayerGenetic(this.canvas));
+            }
         }
 
         // Block
@@ -23,6 +28,37 @@ module.exports.Game = class Game {
         this.blockMinDelayMiliseconds = 1000;
         this.blockDelayRate = 0.8;
         this.lastBlock = 0;
+    }
+    selectFittest() {
+        let result = this.players.sort((a, b) => b.fitness - a.fitness);
+        result.splice(this.parrentsCrossoverAmount);
+        return result;
+    }
+    selectParent() {
+        return this.selectFittest()[
+            Math.floor(Math.random() * this.parrentsCrossoverAmount)
+        ];
+    }
+    createNewGeneration() {
+        const result = this.selectFittest();
+        for (let i = 0; i < this.parrentsCrossoverAmount; i++) {
+            result[i].brain = result[i].brain.crossover(
+                this.selectParent().brain
+            );
+        }
+        while (result.length < this.populationSize) {
+            if (Math.random() > 0.5) {
+                result.push(new PlayerGenetic(this.canvas));
+            } else {
+                result.push(
+                    new PlayerGenetic(
+                        this.canvas,
+                        this.selectFittest()[0].brain
+                    )
+                );
+            }
+        }
+        return result;
     }
     getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min) + min);
@@ -55,6 +91,7 @@ module.exports.Game = class Game {
     }
     drawLoop(currentTime) {
         if (this.isGameOver) {
+            console.log(this.createNewGeneration());
             window.restartGame();
             return;
         }
@@ -76,6 +113,7 @@ module.exports.Game = class Game {
                 const collision = player.collision(block);
                 if (collision) {
                     player.isDead = true;
+                    player.calculateFitness();
                     //this.isGameOver = true;
                     //window.restartGame();
                 }
