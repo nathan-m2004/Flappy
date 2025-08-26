@@ -4,3 +4,49 @@ body {
     margin: 0;
     overflow: hidden;
 }
+
+body {
+    margin: 0;
+    overflow: hidden;
+    color: white;
+    font-family: monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+p,
+label {
+    font-size: 0.85rem;
+}
+
+#gui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 1rem;
+    border-radius: 5px;
+    border: 0px solid white;
+    text-align: left;
+}
+
+h1 {
+    font-size: 1.5em;
+    margin-top: 0;
+}
+
+button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 2px;
+}

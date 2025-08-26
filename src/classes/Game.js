@@ -2,7 +2,7 @@ const { Block } = require("./Blocks.js");
 const { PlayerGenetic } = require("./Genetic.js");
 
 module.exports.Game = class Game {
-    constructor(canvas, players) {
+    constructor(canvas, populationSize, players) {
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
         this.gravity = 9.8;
@@ -11,7 +11,7 @@ module.exports.Game = class Game {
         this.timeStamp = 0;
         this.deltaTime = 0;
 
-        this.populationSize = 10000;
+        this.populationSize = populationSize;
         if (players) {
             this.players = players;
         } else {
@@ -28,6 +28,20 @@ module.exports.Game = class Game {
         this.blockDelayRate = 0.8;
         this.lastBlock = 0;
     }
+    getBestScore() {
+        let best = this.players.sort((a, b) => b.score - a.score);
+        return best[0].score;
+    }
+    getPlayersAlive() {
+        let playersAlive = this.players.reduce((sum, player) => {
+            if (player.isDead === false) {
+                return (sum = sum + 1);
+            } else {
+                return sum;
+            }
+        }, 0);
+        return playersAlive;
+    }
     fittestProbabilities() {
         let sumOfFitness = this.players.reduce(
             (sum, player) => sum + player.fitness,
@@ -37,7 +51,6 @@ module.exports.Game = class Game {
             return this.players.map(() => 1 / this.players.length);
         }
 
-        console.log(sumOfFitness);
         return this.players.map((player) => player.fitness / sumOfFitness);
     }
     selectParent() {
@@ -47,7 +60,6 @@ module.exports.Game = class Game {
         for (let i = 0; i < this.players.length; i++) {
             randomNumber -= probabilities[i];
             if (randomNumber <= 0) {
-                console.log(this.players[i]);
                 return this.players[i];
             }
         }
@@ -55,8 +67,8 @@ module.exports.Game = class Game {
         return this.players[this.players.length - 1];
     }
     createNewGeneration() {
-        let result = [this.players[0]];
-        for (let i = 0; i < this.populationSize; i++) {
+        let result = [new PlayerGenetic(this.canvas, this.players[0].brain)];
+        for (let i = 0; i < this.populationSize - 1; i++) {
             const parent = this.selectParent();
             const crossover = parent.brain.crossover(parent.brain);
             const player = new PlayerGenetic(this.canvas, crossover);
@@ -142,6 +154,7 @@ module.exports.Game = class Game {
         this.context.stroke();
 
         this.animationFrame = window.requestAnimationFrame((currentTime) => {
+            window.updateGUI();
             game.drawLoop(currentTime);
         });
     }

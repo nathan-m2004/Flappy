@@ -16,6 +16,24 @@
     </head>
     <body>
         <canvas id="flappyCanvas"></canvas>
+        <div id="gui">
+            <h1>Flappy AI</h1>
+            <button id="startAI">Start</button>
+            <button id="restartGame">Restart Game</button>
+            <p>Generation: <span id="generation">0</span></p>
+            <p>Best Score: <span id="bestScore">0</span></p>
+            <p>Players Alive: <span id="playersAlive">0</span></p>
+            <div class="menu-item">
+                <label for="populationSizeInput">Population Size:</label>
+                <input
+                    type="number"
+                    id="populationSizeInput"
+                    value="1000"
+                    min="10"
+                    max="20000"
+                />
+            </div>
+        </div>
         <script src="main.js"></script>
     </body>
 </html>

@@ -146,7 +146,6 @@ module.exports.PlayerGenetic = class PlayerGenetic {
     addScore() {
         if (this.isDead) return;
         this.score += 1;
-        console.log(this.score);
     }
     think(block, canvas, timeStamp) {
         if (block && !this.isDead) {
