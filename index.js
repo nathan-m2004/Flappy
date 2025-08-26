@@ -11,6 +11,8 @@ const createWindow = () => {
     });
 
     window.loadFile("src/index.html");
+
+    window.setMenuBarVisibility(false);
 };
 
 app.whenReady().then(() => {
