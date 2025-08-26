@@ -12,6 +12,16 @@ function restartWithNextGeneration() {
     });
 }
 
+function restartGame() {
+    window.cancelAnimationFrame(game.animationFrame);
+
+    game = new Game(canvas);
+    game.isGameOver = false;
+    game.animationFrame = window.requestAnimationFrame((currentTime) => {
+        game.drawLoop(currentTime);
+    });
+}
+
 window.onload = () => {
     function resizeCanvas() {
         canvas.width = window.innerWidth;
