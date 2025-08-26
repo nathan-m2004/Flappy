@@ -23,6 +23,42 @@ class NeuralNetwork {
         this.weights_ho.randomize();
     }
 
+    mutate(rate) {
+        let mutated = new NeuralNetwork(
+            this.inputNodes,
+            this.hiddenNodes,
+            this.outputNodes
+        );
+        for (let r = 0; r < this.bias_h.rows; r++) {
+            for (let c = 0; c < this.bias_h.cols; c++) {
+                if (Math.random() < rate) {
+                    this.bias_h.data[r][c] = mutated.bias_h.data[r][c];
+                }
+            }
+        }
+        for (let r = 0; r < this.bias_o.rows; r++) {
+            for (let c = 0; c < this.bias_o.cols; c++) {
+                if (Math.random() < rate) {
+                    this.bias_o.data[r][c] = mutated.bias_o.data[r][c];
+                }
+            }
+        }
+        for (let r = 0; r < this.weights_ih.rows; r++) {
+            for (let c = 0; c < this.weights_ih.cols; c++) {
+                if (Math.random() < rate) {
+                    this.weights_ih.data[r][c] = mutated.weights_ih.data[r][c];
+                }
+            }
+        }
+        for (let r = 0; r < this.weights_ho.rows; r++) {
+            for (let c = 0; c < this.weights_ho.cols; c++) {
+                if (Math.random() < rate) {
+                    this.weights_ho.data[r][c] = mutated.weights_ho.data[r][c];
+                }
+            }
+        }
+    }
+
     crossover(brain) {
         let child = new NeuralNetwork(
             this.inputNodes,
@@ -97,12 +133,15 @@ module.exports.PlayerGenetic = class PlayerGenetic {
         }
         this.player = new Player(canvas.width / 4, canvas.height / 3, 0.45);
         this.score = 0;
+        this.timeAlive;
+        this.startTime = Date.now();
         this.isDead = false;
         this.fitness;
     }
     calculateFitness() {
-        const scoreNormalized = map(this.score, 0, 50, -1, 0);
-        this.fitness = scoreNormalized;
+        //const scoreNormalized = map(this.score, 0, 10, 0, 1);
+        //const timeNormalized = map(this.timeAlive, 0, 10, 0, 1);
+        this.fitness = this.score + this.timeAlive;
     }
     addScore() {
         if (this.isDead) return;
@@ -130,6 +169,10 @@ module.exports.PlayerGenetic = class PlayerGenetic {
                 this.jump(timeStamp);
             }
         }
+    }
+    calculateTime() {
+        const currentTime = Date.now();
+        this.timeAlive = (currentTime - this.startTime) / 1000;
     }
     jump(timeStamp) {
         this.player.jump(timeStamp);
