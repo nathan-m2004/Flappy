@@ -1,7 +1,7 @@
 const { Game } = require("./classes/Game.js");
 const canvas = document.getElementById("flappyCanvas");
 
-function restartGame() {
+function restartWithNextGeneration() {
     window.cancelAnimationFrame(game.animationFrame);
 
     const newGeneration = game.createNewGeneration();
