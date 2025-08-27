@@ -51,6 +51,46 @@ think(block, canvas, timeStamp) {
 }
 ```
 
+Crossover
+-
+The `crossover(brain)` function is called from a brain and receives a brain. It initiates at the top a new child brain that will be returned at the end of the function.
+```javascript
+// NeuralNetowrk class
+crossover(brain) {
+        let child = new NeuralNetwork(this.inputNodes, this.hiddenNodes, this.outputNodes);
+```
+For each `weight` and `bias` we loop through all the values of the Matrix and decide with `50/50` from which parent the child will inherit the gene
+```javascript
+for (let r = 0; r < this.weights_ih.rows; r++) {
+    for (let c = 0; c < this.weights_ih.cols; c++) {
+    if (Math.random() > 0.5) {
+      child.weights_ih.data[r][c] = brain.weights_ih.data[r][c];
+    } else {
+      child.weights_ih.data[r][c] = this.weights_ih.data[r][c];
+    }
+  }
+}
+```
+
+Mutation
+-
+`mutate(rate)` is called from a brain and takes a value between 0 and 1. It will create a new mutated brain and change the values of each Matrix on the original brain with the specified rate.
+```javascript
+// NeuralNetowrk class
+// Mutated array initialized in the top of the function
+let mutated = new NeuralNetwork(this.inputNodes, this.hiddenNodes, this.outputNodes);
+```
+```javascript
+// Mutation of this.weights_ih
+for (let r = 0; r < this.weights_ih.rows; r++) {
+    for (let c = 0; c < this.weights_ih.cols; c++) {
+      if (Math.random() < rate) {
+        this.weights_ih.data[r][c] = mutated.weights_ih.data[r][c];
+      }
+  }
+}
+```
+
 New Generations
 -
 
@@ -63,6 +103,7 @@ calculateFitness() {
 ```
 When all players die we make a distribution of the probabilities
 ```javascript
+// Game class
 fittestProbabilities() {
   let sumOfFitness = this.players.reduce((sum, player) => sum + player.fitness, 0);
 
@@ -75,6 +116,7 @@ fittestProbabilities() {
 ```
 So that when we select a random parent for a new player brain we can get higher probability of getting a higher fitness one
 ```javascript
+// Game class
 selectParent() {
   const probabilities = this.fittestProbabilities();
   let randomNumber = Math.random();
@@ -91,6 +133,7 @@ selectParent() {
 ```
 We use the `selectParent()` function to `crossover()` new child brains, we use then to create new player, then we mutate and return an array of new players
 ```javascript
+// Game class
 createNewGeneration() {
   let result = [new PlayerGenetic(this.canvas, this.players[0].brain)];
   for (let i = 0; i < this.populationSize - 1; i++) {
@@ -101,22 +144,5 @@ createNewGeneration() {
     result.push(player);
   }
   return result;
-}
-```
-The `crossover(brain)` function is called from a brain and receives a brain. It initiates at the top a new child brain that will be returned at the end of the function.
-```javascript
-crossover(brain) {
-        let child = new NeuralNetwork(this.inputNodes, this.hiddenNodes, this.outputNodes);
-```
-For each `weight` and `bias` we loop through all the values of the Matrix and decide with `50/50` from which parent the child will inherit the gene
-```javascript
-for (let r = 0; r < this.weights_ih.rows; r++) {
-    for (let c = 0; c < this.weights_ih.cols; c++) {
-    if (Math.random() > 0.5) {
-      child.weights_ih.data[r][c] = brain.weights_ih.data[r][c];
-    } else {
-      child.weights_ih.data[r][c] = this.weights_ih.data[r][c];
-    }
-  }
 }
 ```
