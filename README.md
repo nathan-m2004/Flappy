@@ -14,9 +14,9 @@ this.bias_o = new Matrix(this.outputNodes, 1);
 this.weights_ih = new Matrix(hiddenNodes, inputNodes);
 this.weights_ho = new Matrix(outputNodes, hiddenNodes);
 ```
-Every matrix has it's values randomized from numbers to -1 to 1. The `weights` are the actual genes of the brain, and the `bias` is added to this weights to dictate the amount of activation.
+Every matrix has it's values randomized from numbers to -1 to 1. The `weights` are the actual genes of the brain, and the `bias` is added to these weights to dictate the amount of activation.
 
-The most important function in `NeuralNetwork` is the `feedForward()` it will take a `inputArray` that will be the values we read from the game, normalized between -1 and 1.
+The most important function in `NeuralNetwork` is the `feedForward()` it will take an `inputArray` that will be the values we read from the game, normalized between -1 and 1.
 We use this array to make a matrix with 1 column and use the `Matrix` class to multiply it by the first Matrix of our brain `weights_ih`, than we add the first bias `bias_h` and perform a `sigmoid` function to map values between 0 and 1
 
 ```javascript
@@ -28,7 +28,7 @@ feedForward(inputArray) {
   hidden.sigmoid();
 ```
 
-After this we repeat the process using the `hidden` weight layer, and return the values as a array
+After this we repeat the process using the `hidden` weight layer, and return the values as an array
 
 ```javascript
   let output = Matrix.multiply(this.weights_ho, hidden);
@@ -89,7 +89,7 @@ selectParent() {
   return this.players[this.players.length - 1];
 }
 ```
-We use the `selectParent()` function to `crossover()` new child brains, we use then to create new player, then we mutate and return a array of new players
+We use the `selectParent()` function to `crossover()` new child brains, we use then to create new player, then we mutate and return an array of new players
 ```javascript
 createNewGeneration() {
   let result = [new PlayerGenetic(this.canvas, this.players[0].brain)];
@@ -101,5 +101,22 @@ createNewGeneration() {
     result.push(player);
   }
   return result;
+}
+```
+The `crossover(brain)` function is called from a brain and receives a brain. It initiates at the top a new child brain that will be returned at the end of the function.
+```javascript
+crossover(brain) {
+        let child = new NeuralNetwork(this.inputNodes, this.hiddenNodes, this.outputNodes);
+```
+For each `weight` and `bias` we loop through all the values of the Matrix and decide with `50/50` from which parent the child will inherit the gene
+```javascript
+for (let r = 0; r < this.weights_ih.rows; r++) {
+    for (let c = 0; c < this.weights_ih.cols; c++) {
+    if (Math.random() > 0.5) {
+      child.weights_ih.data[r][c] = brain.weights_ih.data[r][c];
+    } else {
+      child.weights_ih.data[r][c] = this.weights_ih.data[r][c];
+    }
+  }
 }
 ```
